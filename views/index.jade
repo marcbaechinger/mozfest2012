@@ -2,8 +2,38 @@ extends layout
 
 block content
   h1= title
-  p Welcome to #{title}
   p Here we go:
-  canvas
-  a(href='/record')
-    button(class='btn btn-info') Press me! :)
+  video(autoplay='autoplay', width=500, height=300)
+  p To start, click the button..
+  button(class='btn btn-info', onclick='capture();') Press me! :)
+
+  script(type='text/javascript')
+    function capture() {
+      var errorCallback = function(e) {
+        alert('Error!!');
+      };
+
+      var notSupportedCallback = function() {
+        alert('Your browser does not support this yet!');
+      }
+
+      window.URL = window.URL || window.webkitURL;
+      navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia ||
+                                navigator.mozGetUserMedia || navigator.msGetUserMedia;
+      var video = document.querySelector('video');
+      if (navigator.getUserMedia) {
+        navigator.getUserMedia({audio: false, video: true}, function(stream) {
+          if (navigator.mozGetUserMedia) {
+            video.mozSrcObject = stream
+          } else {
+            video.src = window.URL.createObjectURL(stream);
+          }
+          
+          video.onloadedmetadata = function(e) {
+            video.play();
+          }
+        }, errorCallback);
+      } else {
+        notSupportedCallback();
+      }
+    }
